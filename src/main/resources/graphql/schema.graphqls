@@ -1,0 +1,38 @@
+type Query {
+    earnings(input: EarningsInput!): EarningsResult!
+}
+
+input EarningsInput {
+    income: IncomeInput!
+    expenses: [ExpenseInput!]!
+    decimalPlaces: Int
+}
+
+input IncomeInput {
+    amount: Float!
+    frequency: FrequencyInput
+}
+
+input FrequencyInput {
+    multiplier: Int!
+    interval: FrequencyInterval!
+}
+
+enum FrequencyInterval {
+    SECOND,
+    MINUTE,
+    HOUR,
+    DAY,
+    WEEK,
+    MONTH,
+    YEAR
+}
+
+input ExpenseInput {
+    amount: Float,
+    frequency: FrequencyInput
+}
+
+type EarningsResult {
+    amount: Float
+}
