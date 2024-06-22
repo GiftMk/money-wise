@@ -1,9 +1,12 @@
+import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
+
 plugins {
 	id("org.springframework.boot") version "3.3.1"
 	id("io.spring.dependency-management") version "1.1.5"
 	kotlin("plugin.jpa") version "1.9.24"
 	kotlin("jvm") version "1.9.24"
 	kotlin("plugin.spring") version "1.9.24"
+	id("com.diffplug.spotless") version "7.0.0.BETA1"
 }
 
 group = "com.moneywise"
@@ -17,6 +20,10 @@ java {
 
 repositories {
 	mavenCentral()
+}
+
+object Versions {
+	const val KOTEST = "5.9.0"
 }
 
 dependencies {
@@ -33,6 +40,9 @@ dependencies {
 	testImplementation("org.springframework:spring-webflux")
 	testImplementation("org.springframework.graphql:spring-graphql-test")
 	testImplementation("org.springframework.security:spring-security-test")
+	testImplementation("io.kotest:kotest-runner-junit5:${Versions.KOTEST}")
+	testImplementation("io.kotest:kotest-assertions-core:${Versions.KOTEST}")
+	testImplementation("io.kotest:kotest-property:${Versions.KOTEST}")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
@@ -44,4 +54,19 @@ kotlin {
 
 tasks.withType<Test> {
 	useJUnitPlatform()
+}
+
+configure<com.diffplug.gradle.spotless.SpotlessExtension> {
+	kotlin {
+		targetExclude("build/**/*")
+		ktfmt().kotlinlangStyle()
+	}
+}
+
+afterEvaluate {
+	tasks.findByName("spotlessApply")?.let {
+		tasks.withType(KotlinCompile::class).configureEach {
+			finalizedBy(it)
+		}
+	}
 }
